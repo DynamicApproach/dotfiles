@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)" # Get the path of the directory containing the script
-BASH_PROFILE="$SCRIPT_DIR/.bash_profile"                               # Set the path of the .bash_profile file to the same directory as the script
+BASH_PROFILE="{{.chezmoi.sourceDir}}/.chezmoi/dotfiles/.bash_profile"  # Set the path of the .bash_profile file to the same directory as the script
 PROJECTS_DIR="$HOME/Projects"
 echo "Checking for $PROJECTS_DIR..."
 if [ ! -d "$PROJECTS_DIR" ]; then
@@ -45,13 +45,13 @@ chmod +x install-setup.sh docksal-fix.sh micro.sh wakatime.sh
 
 # Execute the scripts in order
 echo "Executing install-setup.sh..."
-./install-setup.sh
+.{{.chezmoi.sourceDir}}/scripts/install-setup.sh
 echo "Executing docksal-fix.sh..."
-./docksal-fix.sh
+.{{.chezmoi.sourceDir}}/scripts/docksal-fix.sh
 echo "Executing micro.sh..."
-./micro.sh
+.{{.chezmoi.sourceDir}}/scripts/micro.sh
 echo "Executing wakatime.sh..."
-./wakatime.sh
+.{{.chezmoi.sourceDir}}/scripts/wakatime.sh
 
 # Activate zsh
 echo "Activating zsh..."

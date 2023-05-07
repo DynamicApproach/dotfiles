@@ -1,0 +1,18 @@
+[data]
+  email = "lloydjonesthomas@gmail.com"
+  name = "Thomas"
+
+[data.git]
+  email = "lloydjonesthomas@gmail.com"
+  name = "DynamicApproach"
+
+[template]
+  include = [
+    "{*,.*}",
+    "!*.swp",
+    "!*.bak",
+    "!LICENSE",
+    "!README.md",
+    "!chezmoi*",
+    "!Makefile",
+  ]

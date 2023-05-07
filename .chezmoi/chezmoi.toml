@@ -1,6 +1,6 @@
 [data]
   email = "lloydjonesthomas@gmail.com"
-  name = "Thomas"
+  name = "DynamicApproach"
 
 [data.git]
   email = "lloydjonesthomas@gmail.com"
@@ -16,3 +16,5 @@
     "!chezmoi*",
     "!Makefile",
   ]
+[run]
+once = ["$HOME/dotfiles/run_once_setup_environment.sh"]

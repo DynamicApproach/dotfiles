@@ -17,4 +17,4 @@
     "!Makefile",
   ]
 [run]
-once = ["$HOME/dotfiles/run_once_setup_environment.sh"]
+once = ["{{ .chezmoi.sourceDir }}/scripts/run_once_setup_environment.sh"]

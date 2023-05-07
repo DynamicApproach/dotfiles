@@ -13,8 +13,7 @@
     "!*.bak",
     "!LICENSE",
     "!README.md",
-    "!chezmoi*",
-    "!Makefile",
+    "!Makefile"
   ]
 [run]
-once = ["{{ .chezmoi.sourceDir }}/scripts/run_once_setup_environment.sh"]
+once = ["{{.chezmoi.sourceDir}}/scripts/run_once_setup_environment.sh"]

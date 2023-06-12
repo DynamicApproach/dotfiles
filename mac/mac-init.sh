@@ -47,19 +47,30 @@ brew install --cask github iterm2 background-music fig visual-studio-code discor
 docker microsoft-teams
 check_status "Casks installation"
 
+# Set the font URL
+font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip"
+
+# Set the destination directory
+dest_dir="$HOME/Library/Fonts"
+
+# Download the zip file
+curl -L $font_url -o font.zip
+
+# Unzip the font files
+unzip -o font.zip -d fonts_temp
+
+# Move font files to destination directory
+find ./fonts_temp -name "*.ttf" -exec mv {} $dest_dir \;
+
+# Remove temporary directories and files
+rm -rf fonts_temp font.zip
+
+echo "The font has been successfully installed."
+
 # Set ZSH as your default shell
 echo "Setting ZSH as default shell..."
 chsh -s $(which zsh)
 check_status "Setting ZSH as default shell"
-
-# Install Oh My Zsh if it's not already installed
-if [ ! -d "$HOME/.oh-my-zsh" ]; then
-    echo "Installing Oh My Zsh..."
-    sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-    check_status "Oh My Zsh installation"
-else
-    echo "Oh My Zsh is already installed."
-fi
 
 # Install Composer
 echo "Installing Composer..."

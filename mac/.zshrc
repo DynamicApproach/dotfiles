@@ -1,6 +1,28 @@
 # Fig pre block. Keep at the top of this file.
 [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
 
+####################### ALIAS ####################
+alias ls="ls -aG"
+alias buildwork="composer install && ./scripts/wny/install-docksal-drupal.sh && fin blt sync:refresh"
+alias root="cd /"
+alias home="cd $HOME"
+alias docs="cd $HOME/Documents"
+alias work="cd $HOME/Projects"
+alias refresh="omz reload"
+alias up="cd .."
+alias Root="cd /"
+alias docker-clean="docker rm -f $(docker ps -a -q)"
+alias work-update="fin update"
+alias editzsh="micro ~/.zshrc"
+alias Home="cd $HOME"
+alias Docs="cd $HOME/Documents"
+alias WORK="cd $HOME/Projects"
+alias Work="cd $HOME/Projects"
+alias Refresh="omz reload"
+alias Up="cd .."
+###################### END ALIAS ###################
+
+
 # Set up the prompt
 autoload -Uz promptinit
 promptinit
@@ -91,7 +113,7 @@ test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell
 export PATH="/usr/local/opt/php@8.1/bin:$PATH"
 export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
 export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-export STARSHIP_DISTRO="TLJ 🍎 - "
+export STARSHIP_DISTRO="TLJ  - 🍎 "
 source /usr/local/opt/antidote/share/antidote/antidote.zsh
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 eval "$(atuin init zsh)"

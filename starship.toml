@@ -3,7 +3,10 @@
 
 # Inserts a blank line between shell prompts
 add_newline = true
+palette = 'TLJPurple'
 
+scan_timeout = 10000
+command_timeout	= 10000
 # Change the default prompt format
 format = """\
 [╭╴](238)$env_var\
@@ -28,7 +31,7 @@ format = 'took [$duration](bold yellow)'
 style_user = "white bold"
 style_root = "cyan bold"
 show_always = true
-format = "[$user]($style)[$env(ISMAC)]($style)"
+format = "$STARSHIP_DISTRO[$user]($style)($style)"
 
 [aws]
 symbol = "  "
@@ -147,7 +150,7 @@ symbol = " "
 
 [localip]
 ssh_only = false
-format = ' [$localipv4](bold red) '
+format = '🌐[$localipv4](bold red) '
 disabled = false
 
 [memory_usage]
@@ -246,3 +249,45 @@ use_12hr = true
 
 [vagrant]
 format = "via [ vagrant $version]($style) "
+
+[palettes.TLJPurple]
+background = "#111111"
+bg1 = '#111111'  #background
+fg1 = '#76E4FF'  #foreground
+
+bg2 = '#121212'  #black
+fg2 = '#5C78FF'  #brightBlue
+
+bg3 = '#492AB9'  #blue
+fg3 = '#B18BFD'  #brightGreen
+
+bg4 = '#5c4daf'  #brightBlack
+fg4 = '#5EA2FF'  #brightPurple
+
+bg5 = '#5A6BFF'  #brightCyan
+fg5 = '#BA5AFF'  #brightRed
+
+root_user_bg = '#905AFC'  #green
+root_user_fg = '#5C78FF'  #brightWhite
+accent = '#9264FF'  #brightYellow
+bg = "#111111"
+black = "#121212"
+blue = "#492AB9"
+bright_black = "#5c4daf"
+bright_blue = "#5C78FF"
+bright_cyan = "#5A6BFF"
+bright_green = "#B18BFD"
+bright_purple = "#5EA2FF"
+bright_red = "#BA5AFF"
+bright_white = "#5C78FF"
+bright_yellow = "#9264FF"
+cursor_color = "#728AFF"
+cyan = "#5C78FF"
+foreground = "#76E4FF"
+green = "#905AFC"
+purple = "#2883FF"
+red = "#A52AFF"
+selection_background = "#5A85B9"
+white = "#5C78FF"
+yellow = "#B97EFD"
+fg="#76E4FF"

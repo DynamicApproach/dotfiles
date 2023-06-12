@@ -1,0 +1,34 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = DynamicApproach
+	email = lloydjonesthomas@gmail.com
+[core]
+	filemode = false
+	autocrlf = true
+[http]
+	sslVerify = false
+[color]
+    ui = auto
+[init]
+    defaultBranch = main
+[pager]
+    diff = diff-so-fancy | less --tabs=4 -RXFE -+S
+    log = diff-so-fancy | less --tabs=4 -RFX -+S
+    show = diff-so-fancy | less --tabs=4 -RXFE -+S
+    diff = delta
+    log = delta
+    show = delta
+    blame = delta
+    reflog = delta
+[diff]
+    compactionHeuristic = true 
+    submodule = log
+    indentHeuristic = true
+    colorMoved = default	
+[delta]
+    syntax-theme = Solarized (dark)
+    features = decorations navigate 

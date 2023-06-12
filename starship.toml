@@ -28,15 +28,15 @@ format = 'took [$duration](bold yellow)'
 style_user = "white bold"
 style_root = "cyan bold"
 show_always = true
-format = "[$user]($style)🌐[$env(ISMAC)]($style)"
+format = "[$user]($style)[$env(ISMAC)]($style)"
 
 [aws]
 symbol = "  "
 
 [battery]
-full_symbol = '🔋 '
+full_symbol = '� '
 charging_symbol = '⚡️ '
-discharging_symbol = '💀 '
+discharging_symbol = '� '
 [[battery.display]]
 threshold = 10
 style = 'bold red'
@@ -54,7 +54,7 @@ symbol = " "
 symbol = " "
 
 [directory]
-read_only = " 󰌾"
+read_only = " �"
 truncate_to_repo = true
 truncation_symbol = "‥/"
 format = "@ [$path]($style)[$read_only]($read_only_style) "
@@ -83,24 +83,23 @@ disabled = false
 
 [git_commit]
 commit_hash_length = 4
-tag_symbol = '🔖 '
+tag_symbol = '� '
 format = '[$symbol$hash]($style) '
 disabled = false
 
 
 [git_status]
 format = '[\($all_status $ahead_behind\)]($style) '
-conflicted = '🚩'
+conflicted = '!='
 ahead = '⇡${count}'
-diverged = '⇕⇡${ahead_count} ⇣${behind_count}'
-behind = '⇣${count}'
+diverged = '⇕ ⇡${ahead_count} ⇣${behind_count}'
+behind = '⇣${count} PULL NEEDED'
 up_to_date = '✓'
-untracked = '🤷'
-stashed = '📦  ⇕⇡${ahead_count} ⇣${behind_count}'
-modified = '📝  ⇕⇡${count} changes '
+untracked = '?'
+stashed = '⇡${ahead_count}⇣${behind_count}'
+modified = '! ⇕⇡ ${count} changes '
 staged = '[++\($count\)](green)'
 renamed = '✒️'
-deleted = '🗑'
 disabled = false
 
 [git_metrics]
@@ -152,13 +151,13 @@ format = ' [$localipv4](bold red) '
 disabled = false
 
 [memory_usage]
-symbol = "󰍛 "
+symbol = "� "
 
 [meson]
-symbol = "󰔷 "
+symbol = "� "
 
 [nim]
-symbol = "󰆥 "
+symbol = "� "
 
 [nix_shell]
 symbol = " "
@@ -167,6 +166,8 @@ symbol = " "
 symbol = " "
 format = "via [ $version](bold green) "
 disabled = true
+
+
 
 [os.symbols]
 Alpaquita = " "
@@ -182,10 +183,10 @@ Emscripten = " "
 EndeavourOS = " "
 Fedora = " "
 FreeBSD = " "
-Garuda = "󰛓 "
+Garuda = "� "
 Gentoo = " "
-HardenedBSD = "󰞌 "
-Illumos = "󰈸 "
+HardenedBSD = "� "
+Illumos = "� "
 Linux = " "
 Mabox = " "
 Macos = " "
@@ -195,31 +196,31 @@ MidnightBSD = " "
 Mint = " "
 NetBSD = " "
 NixOS = " "
-OpenBSD = "󰈺 "
+OpenBSD = "� "
 openSUSE = " "
-OracleLinux = "󰌷 "
+OracleLinux = "� "
 Pop = " "
 Raspbian = " "
 Redhat = " "
 RedHatEnterprise = " "
-Redox = "󰀘 "
-Solus = "󰠳 "
+Redox = "� "
+Solus = "� "
 SUSE = " "
 Ubuntu = " "
 Unknown = " "
-Windows = "🪟 "
+Windows = "� "
 
 [package]
-symbol = "󰏗  [$version](208 bold) "
+symbol = "� "
 
 [pijul_channel]
-symbol = "🪺 "
+symbol = "� "
 
 [python]
 symbol = " "
 
 [rlang]
-symbol = "󰟔 "
+symbol = "� "
 
 [ruby]
 symbol = "via [ $version]($style)"
@@ -231,14 +232,14 @@ symbol = " "
 symbol = " "
 
 [spack]
-symbol = "🅢 "
+symbol = "� "
 
 [terraform]
 format = "via [ terraform $version]($style) 壟 [$workspace]($style) "
 
 [time]
 disabled = false
-format = '🕙[\[ $time \]]($style) '
+format = '🕰️[\[ $time \]]($style) '
 time_format = '%T'
 utc_time_offset = '-5'
 use_12hr = true

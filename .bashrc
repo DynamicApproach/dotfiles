@@ -1,12 +1,17 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
-# If not running interactively, don't do anything
-case $- in
-    *i*) ;;
-      *) return;;
-esac
+if [[ "$(uname)" == "Darwin" ]]; then
+  # Fig pre block. Keep at the top of this file.
+  [[ -f "$HOME/.fig/shell/bashrc.pre.bash" ]] && builtin source "$HOME/.fig/shell/bashrc.pre.bash"
+fi
+# Check if on WSL (Linux)
+if [[ "$(uname)" == "Linux" ]]; then
+  # Windows-specific pre block.
+  # If not running interactively, don't do anything
+    case $- in
+        *i*) ;;
+        *) return;;
+    esac
+  # Windows-specific post block.
+fi
 
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
@@ -115,10 +120,15 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
 eval "$(starship init bash)"
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
-[[ -f ~/.bash-preexec.sh ]] && source ~/.bash-preexec.sh
 eval "$(atuin init bash)"
+
+if [[ "$(uname)" == "Darwin" ]]; then
+  # Fig post block. Keep at the bottom of this file.
+  [[ -f "$HOME/.fig/shell/bashrc.post.bash" ]] && builtin source "$HOME/.fig/shell/bashrc.post.bash"
+fi

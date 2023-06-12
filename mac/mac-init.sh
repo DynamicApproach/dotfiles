@@ -94,8 +94,12 @@ if [ -f "$HOME/.zshrc" ]; then
 fi
 
 echo "Moving new .zshrc into place..."
-cp .zshrc "$HOME/.zshrc"
+cp ../.zshrc "$HOME/.zshrc"
 check_status "Moving new .zshrc"
+
+echo "Moving new starship into place..."
+cp ../Starship.toml "$HOME/.config/starship.toml"
+check_status "Moving new starship.toml"
 
 # Copy zsh_plugins.txt if it exists
 if [ -f "$HOME/.zsh_plugins.txt" ]; then
@@ -104,7 +108,7 @@ if [ -f "$HOME/.zsh_plugins.txt" ]; then
     check_status "Backing up existing .zsh_plugins.txt"
 fi
 echo "Moving new .zsh_plugins.txt into place..."
-cp .zsh_plugins.txt "$HOME/.zsh_plugins.txt"
+cp ../.zsh_plugins.txt "$HOME/.zsh_plugins.txt"
 check_status "Moving new .zsh_plugins.txt"
 
 # Set Micro as the default terminal editor for the current user

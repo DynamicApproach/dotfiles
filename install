@@ -1,34 +1,40 @@
+#!/bin/sh
+
 # Directory where source configuration files are located
 SRC_DIR=$(dirname "$0")
 
 # Python installation function should be defined
-
-if [ "$(uname)" == "Darwin" ]; then
-    OS="macOS"
-    UPDATE_COMMAND="brew update && brew upgrade"
-    INSTALL_COMMAND="brew install"
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    OS="Linux"
-    UPDATE_COMMAND="sudo apt-get update && sudo apt-get upgrade -y"
-    INSTALL_COMMAND="sudo apt-get install -y"
-elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ] || [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
-    echo "Detected Windows"
-    echo "Switching to PowerShell to install Starship"
-    powershell.exe -Command '
-    if(!(Test-Path "C:\ProgramData\scoop")) {
-        Set-ExecutionPolicy RemoteSigned -scope CurrentUser
-        iwr -useb get.scoop.sh | iex
-    }
-    scoop bucket add extras
-    scoop install starship
-    "Invoke-Expression (&starship init powershell) --write | Out-File -Append $PROFILE"
-    . $PROFILE
-    '
-    exit 0 
-else
-    echo "Unsupported OS"
-    exit 1
-fi
+install_python(){
+    if command -v python3 &>/dev/null; then
+        echo "Python 3 is installed"
+    else
+        echo "Python 3 is not installed, installing..."
+        if [ "$(uname)" == "Darwin" ]; then
+            brew install python
+        elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+            sudo apt install python3 -y
+        fi
+    fi
+}
+case "$(uname)" in
+    "Darwin")
+        OS="macOS"
+        UPDATE_COMMAND="brew update && brew upgrade"
+        INSTALL_COMMAND="brew install"
+        ;;
+    "Linux")
+        OS="Linux"
+        UPDATE_COMMAND="sudo apt-get update && sudo apt-get upgrade -y"
+        INSTALL_COMMAND="sudo apt-get install -y"
+        ;;
+    "MINGW32_NT"|"MINGW64_NT")
+        echo "Windows is currently unsupported"
+        exit 1
+        ;;
+    *)
+        echo "Unsupported OS"
+        exit 1
+esac
 
 echo "Detected $OS"
 echo "Updating packages"
@@ -44,11 +50,44 @@ do
     fi
 done
 
-install_python
-echo "Changing default shell to Zsh"
-chsh -s $(which zsh)
 
-if [ "$(uname)" == "Darwin" ]; then
+install_python
+
+if [ "$CODESPACES" != "true" ]; then
+    echo "Changing default shell to Zsh"
+    chsh -s $(which zsh)
+else
+    echo "In Codespaces, not changing default shell"
+fi
+
+if ! command -v starship &> /dev/null
+then
+    echo "Starship not found, installing..."
+    curl -fsSL https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz | tar xvz -C /tmp
+    sudo mv /tmp/starship /usr/local/bin/
+fi
+
+
+
+if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
+then
+    echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+fi
+
+echo "Moving configuration files"
+for file in .zshrc .zsh_plugins.txt .gitconfig
+do
+    if [ ! -f $HOME/$file ]; then
+        mv $SRC_DIR/$file $HOME/
+    fi
+done
+
+
+if [ ! -f $HOME/.config/starship.toml ]; then
+    mv $SRC_DIR/starship.toml $HOME/.config/starship.toml
+fi
+
+if [ "$(uname)" = "Darwin" ]; then
     sudo pip3 install wakatime
     if grep --quiet 'api_key=.' ~/.wakatime.cfg; then
         echo "WakaTime API-key already configured."
@@ -61,30 +100,6 @@ if [ "$(uname)" == "Darwin" ]; then
     fi
     mkdir -p ~/.wakatime
     chmod 700 ~/.wakatime
-fi
-
-if ! command -v starship &> /dev/null
-then
-    echo "Starship not found, installing..."
-    curl -fsSL https://starship.rs/install.sh | bash
-fi
-
-if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
-then
-    echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-fi
-
-echo "Moving configuration files"
-for file in .zshrc .zsh_plugins .gitconfig
-do
-    if [ ! -f $HOME/$file ]; then
-        mv $SRC_DIR/$file $HOME/
-    fi
-done
-
-
-if [ ! -f $HOME/.config/starship.toml ]; then
-    mv $SRC_DIR/starship.toml $HOME/.config/starship.toml
 fi
 
 echo "Installation complete. Please close this terminal window and open a new one to see the changes."

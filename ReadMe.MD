@@ -7,7 +7,9 @@
 - [For Mac](#for-mac)
   `Change the "STARSHIP_DISTRO" variable in the zshrc file to your distro-name or $ENV:STARSHIP_DISTRO = in PS.`
 
-Please note, this is stylized for my personal wants and needs.
+  ![](mac/ChangeEnvExample.png)
+
+  Please note, this is stylized for my personal wants and needs.
 
 ---
 

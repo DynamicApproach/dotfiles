@@ -1,5 +1,7 @@
 # Fig pre block. Keep at the top of this file.
-[[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
+fi
 
 ####################### ALIAS ####################
 alias ls="ls -aG"
@@ -21,8 +23,6 @@ alias Work="cd $HOME/Projects"
 alias Refresh="omz reload"
 alias Up="cd .."
 ###################### END ALIAS ###################
-
-
 # Set up the prompt
 autoload -Uz promptinit
 promptinit
@@ -36,6 +36,7 @@ bindkey -e
 HISTSIZE=10000
 SAVEHIST=10000
 HISTFILE=~/.zsh_history
+
 # Use modern completion system
 autoload -Uz compinit
 compinit
@@ -106,17 +107,53 @@ create_branch() {
   fi
 }
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-source /Users/thomas/.docker/init-zsh.sh || true                   # Added by Docker Desktop
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-export PATH="/usr/local/opt/php@8.1/bin:$PATH"
-export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
-export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-export STARSHIP_DISTRO="TLJ  - 🍎 "
-source /usr/local/opt/antidote/share/antidote/antidote.zsh
-antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-eval "$(atuin init zsh)"
-eval "$(starship init zsh)"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  source /Users/thomas/.docker/init-zsh.sh || true  # Added by Docker Desktop
+  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+  export PATH="/usr/local/opt/php@8.1/bin:$PATH"
+  export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
+  export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+  export STARSHIP_DISTRO="TLJ 🍎 - "
+  source /usr/local/opt/antidote/share/antidote/antidote.zsh
+  antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+  eval "$(atuin init zsh)"
+  eval "$(starship init zsh)"
+else
+  eval "$(dircolors -b)"
+  export STARSHIP_DISTRO="TLJ 🎆 - "
+  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+  source /home/thomas/.antidote/antidote.zsh
+  antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+  chprompt_func() {
+    # Specify the path to the directory with the different configs
+    config_dir=~/.configs/
+
+    # Store the config files as elements of an array
+    ConfigFiles=("${(@f)$(ls $config_dir)}")
+
+    echo "Choose which prompt you want"
+
+    for i in {1..${#ConfigFiles}}; do
+        echo "[$i] ${ConfigFiles[i]}"
+    done
+
+    read choice
+
+    # Replace the contents of the starship.toml file with the contents of the chosen prompt
+    cat "${config_dir}/${ConfigFiles[choice]}" > ~/.config/starship.toml
+}
+
+  alias chprompt='chprompt_func'
+  eval "$(atuin init zsh)"
+  export STARSHIP_CONFIG=/mnt/c/Users/lloyd/.config/starship.toml
+  eval "$(starship init zsh)"
+fi
+
 # Fig post block. Keep at the bottom of this file.
+if [[ "$OSTYPE" == "darwin"* ]]; then
 [[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
+fi

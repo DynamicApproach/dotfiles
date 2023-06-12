@@ -75,12 +75,13 @@ then
 fi
 
 echo "Moving configuration files"
-for file in .zshrc .zsh_plugins
+for file in .zshrc .zsh_plugins .gitconfig
 do
     if [ ! -f $HOME/$file ]; then
         mv $SRC_DIR/$file $HOME/
     fi
 done
+
 
 if [ ! -f $HOME/.config/starship.toml ]; then
     mv $SRC_DIR/starship.toml $HOME/.config/starship.toml

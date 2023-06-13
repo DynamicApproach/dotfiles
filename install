@@ -28,8 +28,16 @@ case "$(uname)" in
         INSTALL_COMMAND="sudo apt-get install -y"
         ;;
     "MINGW32_NT"|"MINGW64_NT")
-        echo "Windows is currently unsupported"
-        exit 1
+        OS="Windows"
+        echo "Running on Windows"
+        PS_SCRIPT_PATH="Windows/InstallChocolateyAndCreateProfile.ps1"
+        if [ -f "$PS_SCRIPT_PATH" ]; then
+            echo "Running PowerShell script"
+            powershell.exe -ExecutionPolicy Bypass -File "$PS_SCRIPT_PATH"
+        else
+            echo "$PS_SCRIPT_PATH does not exist"
+            exit 1
+        fi
         ;;
     *)
         echo "Unsupported OS"

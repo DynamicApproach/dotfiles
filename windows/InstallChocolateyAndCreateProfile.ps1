@@ -31,3 +31,19 @@ if (!(Test-Path -Path $dirPath)) {
 
 # Create the file and write the content
 Set-Content -Path $filePath -Value $fileContent
+
+choco install microsoft-edge-insider-dev -y
+choco install microsoft-teams.install -y
+choco install python3 -y
+choco install 7zip.install -y
+choco install vlc -y
+choco install git.install -y
+choco install nodejs.install  -y
+choco install curl  -y
+choco install amd-ryzen-chipset -y
+choco install powertoys -y
+choco install vscode-insiders.install  -y
+choco install f.lux.install -y
+choco install docker-desktop -y
+choco install starship -y
+choco install php -y

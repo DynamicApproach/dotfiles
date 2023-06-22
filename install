@@ -1,8 +1,6 @@
 #!/bin/sh
-
 # Directory where source configuration files are located
 SRC_DIR=$(dirname "$0")
-
 # Python installation function should be defined
 install_python(){
     if command -v python3 &>/dev/null; then

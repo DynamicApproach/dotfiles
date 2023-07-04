@@ -1,29 +1,44 @@
 #!/bin/sh
 # Directory where source configuration files are located
 SRC_DIR=$(dirname "$0")
+
 # Python installation function should be defined
 install_python(){
+
     if command -v python3 &>/dev/null; then
         echo "Python 3 is installed"
     else
         echo "Python 3 is not installed, installing..."
-        if [ "$(uname)" == "Darwin" ]; then
+        if [ "$(uname)" = "Darwin" ]; then
             brew install python
-        elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-            sudo apt install python3 -y
+        elif [ "$(uname -s)" = "Linux" ]; then
+            if [ -f "/etc/manjaro-release" ]; then
+                sudo pacman -S python
+            else
+                sudo apt install python3 -y
+            fi
         fi
     fi
 }
+
 case "$(uname)" in
     "Darwin")
         OS="macOS"
+        ZSHRC_FILE=".zshrc"
         UPDATE_COMMAND="brew update && brew upgrade"
         INSTALL_COMMAND="brew install"
         ;;
     "Linux")
         OS="Linux"
-        UPDATE_COMMAND="sudo apt-get update && sudo apt-get upgrade -y"
-        INSTALL_COMMAND="sudo apt-get install -y"
+        if [ -f "/etc/manjaro-release" ]; then
+            ZSHRC_FILE=".zshrc-manjaro"
+            UPDATE_COMMAND="sudo pacman -Syu"
+            INSTALL_COMMAND="sudo pacman -S"
+        else
+            ZSHRC_FILE=".zshrc-linux"
+            UPDATE_COMMAND="sudo apt-get update && sudo apt-get upgrade -y"
+            INSTALL_COMMAND="sudo apt-get install -y"
+        fi
         ;;
     "MINGW32_NT"|"MINGW64_NT")
         OS="Windows"
@@ -56,7 +71,6 @@ do
     fi
 done
 
-
 install_python
 
 if [ "$CODESPACES" != "true" ]; then
@@ -69,28 +83,24 @@ fi
 if ! command -v starship &> /dev/null
 then
     echo "Starship not found, installing..."
-    curl -fsSL https://github.com/starship/starship/releases/latest/download/starship-x86_64-unknown-linux-musl.tar.gz | tar xvz -C /tmp
-    sudo mv /tmp/starship /usr/local/bin/
+    sh -c "$(curl -fsSL https://starship.rs/install.sh)"
 fi
-
-
 
 if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
 then
     echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 fi
 
-echo "Moving configuration files"
-for file in .zshrc .zsh_plugins.txt .gitconfig
+echo "Copying configuration files"
+for file in "$ZSHRC_FILE" .zsh_plugins.txt .gitconfig
 do
-    if [ ! -f $HOME/$file ]; then
-        mv $SRC_DIR/$file $HOME/
+    if [ ! -f "$HOME/$file" ]; then
+        cp "$SRC_DIR/$file" "$HOME/"
     fi
 done
 
-
-if [ ! -f $HOME/.config/starship.toml ]; then
-    mv $SRC_DIR/starship.toml $HOME/.config/starship.toml
+if [ ! -f "$HOME/.config/starship.toml" ]; then
+    cp "$SRC_DIR/starship.toml" "$HOME/.config/starship.toml"
 fi
 
 if [ "$(uname)" = "Darwin" ]; then
@@ -107,5 +117,59 @@ if [ "$(uname)" = "Darwin" ]; then
     mkdir -p ~/.wakatime
     chmod 700 ~/.wakatime
 fi
+git config --global user.name "Thomas Lloyd-Jones"
+git config --global user.email "lloydjonesthomas@gmail.com"
+
+
+
+# Function to set up specific shell settings for macOS and other systems
+setup_shell_configurations() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        source /Users/thomas/.docker/init-zsh.sh || true  # Added by Docker Desktop
+        test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+        export PATH="/usr/local/opt/php@8.1/bin:$PATH"
+        export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
+        export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+        export STARSHIP_DISTRO="TLJ 🍎 - "
+        source /usr/local/opt/antidote/share/antidote/antidote.zsh
+        antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+        eval "$(atuin init zsh)"
+        eval "$(starship init zsh)"
+    elif [[ -f "/etc/manjaro-release" ]]; then
+        # Manjaro Linux configurations
+        export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+        export STARSHIP_DISTRO="TLJ 🐧 - "
+        eval "$(atuin init zsh)"
+        eval "$(starship init zsh)"
+    else
+        eval "$(dircolors -b)"
+        export STARSHIP_DISTRO="TLJ 🎆 - "
+        zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+        source /home/thomas/.antidote/antidote.zsh
+        antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+        chprompt_func() {
+            # Specify the path to the directory with the different configs
+            config_dir=~/.configs/
+
+            # Store the config files as elements of an array
+            ConfigFiles=("${(@f)$(ls $config_dir)}")
+
+            echo "Choose which prompt you want"
+
+            for i in {1..${#ConfigFiles}}; do
+                echo "[$i] ${ConfigFiles[i]}"
+            done
+
+            read choice
+
+            # Replace the contents of the starship.toml file with the contents of the chosen prompt
+            cat "${config_dir}/${ConfigFiles[choice]}" > ~/.config/starship.toml
+        }
+    fi
+}
+
+# Add the setup_shell_configurations function to the .zshrc file
+echo "setup_shell_configurations" >> "$HOME/$ZSHRC_FILE"
+
 
 echo "Installation complete. Please close this terminal window and open a new one to see the changes."

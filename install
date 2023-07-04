@@ -73,6 +73,9 @@ done
 
 install_python
 
+echo "Atuin install"
+bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)
+
 if [ "$CODESPACES" != "true" ]; then
     echo "Changing default shell to Zsh"
     chsh -s $(which zsh)
@@ -90,7 +93,6 @@ if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
 then
     echo 'eval "$(starship init zsh)"' >> ~/.zshrc
 fi
-
 echo "Copying configuration files"
 for file in "$ZSHRC_FILE" .zsh_plugins.txt .gitconfig
 do
@@ -117,7 +119,7 @@ if [ "$(uname)" = "Darwin" ]; then
     mkdir -p ~/.wakatime
     chmod 700 ~/.wakatime
 fi
-git config --global user.name "Thomas Lloyd-Jones"
+git config --global user.name "DynamicApproach"
 git config --global user.email "lloydjonesthomas@gmail.com"
 
 

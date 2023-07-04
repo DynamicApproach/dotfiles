@@ -141,6 +141,8 @@ setup_shell_configurations() {
         export STARSHIP_DISTRO="TLJ 🐧 - "
         eval "$(atuin init zsh)"
         eval "$(starship init zsh)"
+        sudo pacman -S noto-fonts-emoji
+        echo "Enable the noto-font in your Konsole profile"
     else
         eval "$(dircolors -b)"
         export STARSHIP_DISTRO="TLJ 🎆 - "

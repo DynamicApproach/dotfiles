@@ -1,179 +1,184 @@
-#!/bin/sh
-# Directory where source configuration files are located
-SRC_DIR=$(dirname "$0")
+#!/bin/bash
 
-# Python installation function should be defined
-install_python(){
+# Check if we're in GitHub Codespaces
+if [ "$CODESPACES" == "true" ]; then
+    echo "This script is running in GitHub Codespaces. Proceeding with setup for Codespaces"
+else
 
-    if command -v python3 &>/dev/null; then
-        echo "Python 3 is installed"
-    else
-        echo "Python 3 is not installed, installing..."
-        if [ "$(uname)" = "Darwin" ]; then
-            brew install python
-        elif [ "$(uname -s)" = "Linux" ]; then
-            if [ -f "/etc/manjaro-release" ]; then
-                sudo pacman -S python
-            else
-                sudo apt install python3 -y
-            fi
-        fi
-    fi
-}
+    echo "Proceeding with setup."
+    # Declare OS-dependent associative arrays
+    declare -A OS_NAMES=(
+        ["Darwin"]="macOS"
+        ["Linux"]="Linux"
+        ["MINGW32_NT"]="Windows"
+        ["MINGW64_NT"]="Windows"
+    )
 
-case "$(uname)" in
-    "Darwin")
-        OS="macOS"
-        ZSHRC_FILE=".zshrc"
-        UPDATE_COMMAND="brew update && brew upgrade"
-        INSTALL_COMMAND="brew install"
-        ;;
-    "Linux")
-        OS="Linux"
-        if [ -f "/etc/manjaro-release" ]; then
-            ZSHRC_FILE=".zshrc-manjaro"
-            UPDATE_COMMAND="sudo pacman -Syu"
-            INSTALL_COMMAND="sudo pacman -S"
+    declare -A ZSHRC_FILES=(
+        ["macOS"]=".zshrc"
+        ["Linux"]=".zshrc-manjaro"
+    )
+
+    declare -A UPDATE_COMMANDS=(
+        ["macOS"]="brew update && brew upgrade"
+        ["Linux"]="sudo pacman -Syu"
+        ["Ubuntu"]="sudo apt-get update && sudo apt-get upgrade -y"
+    )
+
+    declare -A INSTALL_COMMANDS=(
+        ["macOS"]="brew install"
+        ["Linux"]="sudo pacman -S"
+        ["Ubuntu"]="sudo apt-get install -y"
+    )
+
+    # Install Python function
+    install_python() {
+        if command -v python3 &>/dev/null; then
+            echo "Python 3 is installed"
         else
-            ZSHRC_FILE=".zshrc-linux"
-            UPDATE_COMMAND="sudo apt-get update && sudo apt-get upgrade -y"
-            INSTALL_COMMAND="sudo apt-get install -y"
+            echo "Python 3 is not installed, installing..."
+            if [ -z "${INSTALL_COMMANDS[$OS]}" ]; then
+                echo "Error: Unsupported OS for Python installation"
+                exit 1
+            fi
+            ${INSTALL_COMMANDS[$OS]} python3
         fi
-        ;;
-    "MINGW32_NT"|"MINGW64_NT")
-        OS="Windows"
-        echo "Running on Windows"
+    }
+
+    # Detect the OS
+    OS=${OS_NAMES[$(uname)]}
+    if [ -z "$OS" ]; then
+        echo "Error: Unsupported OS"
+        exit 1
+    fi
+    echo "Detected $OS"
+
+    # Directory where source configuration files are located
+    SRC_DIR=$(dirname "$0")
+
+    # Check and set OS-dependent variables
+    if [ "$OS" = "Linux" ]; then
+        if [ -f "/etc/manjaro-release" ]; then
+            ZSHRC_FILE=${ZSHRC_FILES[$OS]}
+            UPDATE_COMMAND=${UPDATE_COMMANDS[$OS]}
+            INSTALL_COMMAND=${INSTALL_COMMANDS[$OS]}
+        else
+            OS="Ubuntu"
+            NU_CONFIG="~/.config/nushell/config.nu"
+            UPDATE_COMMAND=${UPDATE_COMMANDS[$OS]}
+            INSTALL_COMMAND=${INSTALL_COMMANDS[$OS]}
+        fi
+    elif [ "$OS" = "macOS" ]; then
+        ZSHRC_FILE=${ZSHRC_FILES[$OS]}
+        UPDATE_COMMAND=${UPDATE_COMMANDS[$OS]}
+        INSTALL_COMMAND=${INSTALL_COMMANDS[$OS]}
+    elif [ "$OS" = "Windows" ]; then
         PS_SCRIPT_PATH="Windows/InstallChocolateyAndCreateProfile.ps1"
         if [ -f "$PS_SCRIPT_PATH" ]; then
             echo "Running PowerShell script"
             powershell.exe -ExecutionPolicy Bypass -File "$PS_SCRIPT_PATH"
         else
-            echo "$PS_SCRIPT_PATH does not exist"
+            echo "Error: $PS_SCRIPT_PATH does not exist"
             exit 1
         fi
-        ;;
-    *)
-        echo "Unsupported OS"
-        exit 1
-esac
-
-echo "Detected $OS"
-echo "Updating packages"
-$UPDATE_COMMAND
-
-# Install required packages
-for package in zsh curl
-do
-    if ! command -v $package &> /dev/null
-    then
-        echo "$package not found, installing..."
-        $INSTALL_COMMAND $package
     fi
-done
 
-install_python
+    # Update and install required packages
+    echo "Detected $OS"
+    echo "Updating packages"
+    $UPDATE_COMMAND
 
-echo "Atuin install"
-bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)
+    # Install required packages
+    for package in curl git gcc pkg-config libssl-dev
+    do
+        if ! command -v $package &> /dev/null
+        then
+            echo "$package not found, installing..."
+            $INSTALL_COMMAND $package
+        fi
+    done
 
-if [ "$CODESPACES" != "true" ]; then
-    echo "Changing default shell to Zsh"
-    chsh -s $(which zsh)
-else
-    echo "In Codespaces, not changing default shell"
-fi
+    if [ "$OS" = "Ubuntu" ]; then
+        echo "Installing and setting up Nu shell"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        source "$HOME/.cargo/env"
+        cargo install nu --features=dataframe
+        nu nuinstall.nu
 
-if ! command -v starship &> /dev/null
-then
-    echo "Starship not found, installing..."
-    sh -c "$(curl -fsSL https://starship.rs/install.sh)"
-fi
 
-if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
-then
-    echo 'eval "$(starship init zsh)"' >> ~/.zshrc
-fi
-echo "Copying configuration files"
-for file in "$ZSHRC_FILE" .zsh_plugins.txt .gitconfig
-do
-    if [ ! -f "$HOME/$file" ]; then
-        cp "$SRC_DIR/$file" "$HOME/"
     fi
-done
 
-if [ ! -f "$HOME/.config/starship.toml" ]; then
-    cp "$SRC_DIR/starship.toml" "$HOME/.config/starship.toml"
-fi
+    install_python
 
-if [ "$(uname)" = "Darwin" ]; then
-    sudo pip3 install wakatime
-    if grep --quiet 'api_key=.' ~/.wakatime.cfg; then
-        echo "WakaTime API-key already configured."
-    else
-        echo
-        echo "Please input your secret API-key for WakaTime."
-        echo "See https://wakatime.com/settings/api-key"
-        read -p 'API-key: ' key
-        echo -e "[settings]\napi_key=$key" >>~/.wakatime.cfg
+    git config --global user.name "DynamicApproach"
+    git config --global user.email "lloydjonesthomas@gmail.com"
+
+    # Function to set up specific shell settings for macOS and other systems
+    setup_shell_configurations() {
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            ./mac/mac-init.sh
+        elif [[ -f "/etc/manjaro-release" ]]; then
+            # Manjaro Linux configurations
+            export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+            export STARSHIP_DISTRO="TLJ 🐧 - "
+            eval "$(atuin init zsh)"
+            eval "$(starship init zsh)"
+            sudo pacman -S noto-fonts-emoji
+            echo "Enable the noto-font in your Konsole profile"
+        else
+            eval "$(dircolors -b)"
+            export STARSHIP_DISTRO="TLJ 🎆 - "
+        fi
+    }
+
+    if [ "$OS" = "Ubuntu" ]; then
+        echo "Installing and setting up Nu shell"
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+        source "$HOME/.cargo/env"
+        cargo install -f atuin nu --features=dataframe
+        nu nuinstall.nu
+        echo "Installing Visual Studio Code"
+        curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+        sudo install -o root -g root -m 644 microsoft.gpg /usr/share/keyrings/
+        sudo sh -c 'echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+        sudo apt update
+        sudo apt install -y code microsoft-edge-dev
+        sudo apt update
+    else 
+        echo "Atuin install"
+        bash <(curl https://raw.githubusercontent.com/ellie/atuin/main/install.sh)
+        # Add the setup_shell_configurations function to the .zshrc file
+        echo "setup_shell_configurations" >> "$HOME/$ZSHRC_FILE"
+        if [ "$CODESPACES" != "true" ]; then
+            echo "Changing default shell to Zsh"
+            chsh -s $(which zsh)
+        else
+            echo "In Codespaces, not changing default shell"
+        fi
+        if ! command -v starship &> /dev/null
+        then
+            echo "Starship not found, installing..."
+            sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+        fi
+        if ! grep -q 'eval "$(starship init zsh)"' ~/.zshrc
+        then
+            echo 'eval "$(starship init zsh)"' >> ~/.zshrc
+        fi
+        echo "Copying configuration files"
+        for file in "$ZSHRC_FILE" .zsh_plugins.txt .gitconfig
+        do
+            if [ ! -f "$HOME/$file" ]; then
+                cp "$SRC_DIR/$file" "$HOME/"
+            fi
+        done
+        if [ ! -f "$HOME/.config/starship.toml" ]; then
+            cp "$SRC_DIR/starship.toml" "$HOME/.config/starship.toml"
+        fi
     fi
-    mkdir -p ~/.wakatime
-    chmod 700 ~/.wakatime
+
+
+    echo "Installation complete. Please close this terminal window and open a new one to see the changes."
+
+    echo " Exiting..."
+    exit 1
 fi
-git config --global user.name "DynamicApproach"
-git config --global user.email "lloydjonesthomas@gmail.com"
-
-
-
-# Function to set up specific shell settings for macOS and other systems
-setup_shell_configurations() {
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        source /Users/thomas/.docker/init-zsh.sh || true  # Added by Docker Desktop
-        test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-        export PATH="/usr/local/opt/php@8.1/bin:$PATH"
-        export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
-        export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-        export STARSHIP_DISTRO="TLJ 🍎 - "
-        source /usr/local/opt/antidote/share/antidote/antidote.zsh
-        antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-        eval "$(atuin init zsh)"
-        eval "$(starship init zsh)"
-    elif [[ -f "/etc/manjaro-release" ]]; then
-        # Manjaro Linux configurations
-        export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-        export STARSHIP_DISTRO="TLJ 🐧 - "
-        eval "$(atuin init zsh)"
-        eval "$(starship init zsh)"
-        sudo pacman -S noto-fonts-emoji
-        echo "Enable the noto-font in your Konsole profile"
-    else
-        eval "$(dircolors -b)"
-        export STARSHIP_DISTRO="TLJ 🎆 - "
-        zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-        source /home/thomas/.antidote/antidote.zsh
-        antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-        chprompt_func() {
-            # Specify the path to the directory with the different configs
-            config_dir=~/.configs/
-
-            # Store the config files as elements of an array
-            ConfigFiles=("${(@f)$(ls $config_dir)}")
-
-            echo "Choose which prompt you want"
-
-            for i in {1..${#ConfigFiles}}; do
-                echo "[$i] ${ConfigFiles[i]}"
-            done
-
-            read choice
-
-            # Replace the contents of the starship.toml file with the contents of the chosen prompt
-            cat "${config_dir}/${ConfigFiles[choice]}" > ~/.config/starship.toml
-        }
-    fi
-}
-
-# Add the setup_shell_configurations function to the .zshrc file
-echo "setup_shell_configurations" >> "$HOME/$ZSHRC_FILE"
-
-
-echo "Installation complete. Please close this terminal window and open a new one to see the changes."

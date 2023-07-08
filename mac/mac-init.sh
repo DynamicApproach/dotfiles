@@ -31,108 +31,55 @@ echo "Updating Homebrew..."
 brew update
 check_status "Homebrew update"
 
-# Install tools
-echo "Installing tools..."
+# Install tools and casks
+echo "Installing tools and casks..."
 brew install zsh aom fontconfig jpeg-xl libzip pcre2 apr freetds krb5 little-cms2 php \
 apr-util freetype libavif lz4 php@8.1 argon2 gd libidn2 m4 readline aspell gettext libnghttp2 \
 micro rtmpdump atuin gh libpng ncurses sqlite autoconf giflib libpq node starship brotli \
 git-delta libsodium node@16 tidy-html5 c-ares gmp libssh2 nvm unixodbc ca-certificates gpatch \
 libtiff oniguruma webp composer highway libtool openexr xz coreutils icu4c libunistring \
-openldap zsh curl imath libuv openssl@1.1 zstd diff-so-fancy jpeg-turbo libvmaf pcre
-check_status "Tools installation"
+openldap zsh curl imath libuv openssl@1.1 zstd diff-so-fancy jpeg-turbo libvmaf pcre \
+--cask github iterm2 background-music fig visual-studio-code discord keepingyouawake docker \
+microsoft-teams nushell 
+check_status "Tools and casks installation"
 
-# Install casks
-echo "Installing casks..."
-brew install --cask github iterm2 background-music fig visual-studio-code discord keepingyouawake \
-docker microsoft-teams
-check_status "Casks installation"
+# Install Python pip package manager
+echo "Installing Python pip..."
+sudo easy_install pip
+check_status "pip installation"
 
-# Set the font URL
-font_url="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.0.2/JetBrainsMono.zip"
+# Install Wakatime using pip
+echo "Installing Wakatime..."
+sudo pip3 install wakatime
+check_status "Wakatime installation"
 
-# Set the destination directory
-dest_dir="$HOME/Library/Fonts"
-
-# Download the zip file
-curl -L $font_url -o font.zip
-
-# Unzip the font files
-unzip -o font.zip -d fonts_temp
-
-# Move font files to destination directory
-find ./fonts_temp -name "*.ttf" -exec mv {} $dest_dir \;
-
-# Remove temporary directories and files
-rm -rf fonts_temp font.zip
-
-echo "The font has been successfully installed."
-
-# Set ZSH as your default shell
-echo "Setting ZSH as default shell..."
-chsh -s $(which zsh)
-check_status "Setting ZSH as default shell"
-
-# Install Composer
-echo "Installing Composer..."
-brew install composer
-check_status "Composer installation"
-
-# Install Drush
-echo "Installing Drush..."
-composer global require drush/drush
-check_status "Drush installation"
-
-# Install GitHub CLI
-echo "Installing GitHub CLI..."
-brew install gh
-check_status "GitHub CLI installation"
-# Copy zshrc config if it exists
-if [ -f "$HOME/.zshrc" ]; then
-    echo "Copying existing zshrc config to backup..."
-    cp "$HOME/.zshrc" "$HOME/.zshrc.backup"
-    check_status "Backing up existing .zshrc"
+# Configure Wakatime API key
+echo "Configuring Wakatime API key..."
+if grep --quiet 'api_key=.' ~/.wakatime.cfg; then
+    echo "WakaTime API-key already configured."
+else
+    echo
+    echo "Please input your secret API-key for WakaTime."
+    echo "See https://wakatime.com/settings/api-key"
+    read -p 'API-key: ' key
+    echo -e "[settings]\napi_key=$key" >>~/.wakatime.cfg
 fi
+check_status "Wakatime API key configuration"
 
-echo "Moving new .zshrc into place..."
-cp ../.zshrc "$HOME/.zshrc"
-check_status "Moving new .zshrc"
+# Additional settings and installations
+mkdir -p ~/.wakatime
+chmod 700 ~/.wakatime
+source /Users/thomas/.docker/init-zsh.sh || true  # Docker Desktop
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+export PATH="/usr/local/opt/php@8.1/bin:$PATH"
+export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
+export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+export STARSHIP_DISTRO="TLJ 🍎 - "
+source /usr/local/opt/antidote/share/antidote/antidote.zsh
+antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+eval "$(atuin init zsh)"
+eval "$(starship init zsh)"
 
-echo "Moving new starship into place..."
-cp ../Starship.toml "$HOME/.config/starship.toml"
-check_status "Moving new starship.toml"
-
-# Copy zsh_plugins.txt if it exists
-if [ -f "$HOME/.zsh_plugins.txt" ]; then
-    echo "Copying existing zsh_plugins.txt to backup..."
-    cp "$HOME/.zsh_plugins.txt" "$HOME/.zsh_plugins.txt.backup"
-    check_status "Backing up existing .zsh_plugins.txt"
-fi
-echo "Moving new .zsh_plugins.txt into place..."
-cp ../.zsh_plugins.txt "$HOME/.zsh_plugins.txt"
-check_status "Moving new .zsh_plugins.txt"
-
-# Set Micro as the default terminal editor for the current user
-echo "Setting Micro as default terminal editor..."
-echo 'export VISUAL="micro"' >> ~/.zshrc
-echo 'export EDITOR="micro"' >> ~/.zshrc
-check_status "Setting Micro as default terminal editor"
-
-# Create aliases for "edit" and "micro" for the current user
-echo "Creating aliases..."
-echo 'alias edit="micro"' >> ~/.zshrc
-echo 'alias micro="/usr/local/bin/micro"' >> ~/.zshrc
-check_status "Alias creation"
-
-# Add Composer's global bin directory to the system's list of paths.
-echo "Updating PATH in .zshrc..."
-echo 'export PATH="$PATH:$HOME/.composer/vendor/bin"' >> ~/.zshrc
-echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.zshrc
-check_status "PATH update"
-
-# Reload ZSH config
-echo "Reloading ZSH configuration..."
-source ~/.zshrc
-check_status "Reloading ZSH configuration"
 
 # Everything is done
 echo "Script completed successfully!"

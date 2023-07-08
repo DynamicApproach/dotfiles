@@ -40,13 +40,8 @@ git-delta libsodium node@16 tidy-html5 c-ares gmp libssh2 nvm unixodbc ca-certif
 libtiff oniguruma webp composer highway libtool openexr xz coreutils icu4c libunistring \
 openldap zsh curl imath libuv openssl@1.1 zstd diff-so-fancy jpeg-turbo libvmaf pcre \
 --cask github iterm2 background-music fig visual-studio-code discord keepingyouawake docker \
-microsoft-teams nushell 
+microsoft-teams nushell python
 check_status "Tools and casks installation"
-
-# Install Python pip package manager
-echo "Installing Python pip..."
-sudo easy_install pip
-check_status "pip installation"
 
 # Install Wakatime using pip
 echo "Installing Wakatime..."

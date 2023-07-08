@@ -2,9 +2,9 @@
 
 ## Sections:
 
-- [For Windows](#for-windows)
-- [For Linux](#for-linux)
-- [For Mac](#for-mac)
+- [For Windows](#for-windows) -> Powershell / Zsh
+- [For Linux](#for-linux) -> nushell
+- [For Mac](#for-mac) -> Zsh
   `Change the "STARSHIP_DISTRO" variable in the zshrc file to your distro-name or $ENV:STARSHIP_DISTRO = in PS.`
 
   ![](mac/ChangeEnvExample.png)
@@ -39,7 +39,7 @@ Assuming you're using the Starship config supplied, your terminal will look like
 
 ## For Linux:
 
-Use the zshrc and BashRC files in the Windows folder. These are based on WSL2 and will be updated soonish.
+Use the install script!
 
 &nbsp;
 

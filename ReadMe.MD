@@ -7,6 +7,8 @@
 - [For Mac](#for-mac) -> Zsh
   `Change the "STARSHIP_DISTRO" variable in the zshrc file to your distro-name or $ENV:STARSHIP_DISTRO = in PS.`
 
+  VS Code Theme link: [VS Code Theme](https://marketplace.visualstudio.com/items?itemName=DynamicApproach.purple-night-tlj)
+
   ![](mac/ChangeEnvExample.png)
 
   Please note, this is stylized for my personal wants and needs.

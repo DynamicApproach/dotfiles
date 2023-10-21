@@ -33,14 +33,7 @@ check_status "Homebrew update"
 
 # Install tools and casks
 echo "Installing tools and casks..."
-brew install zsh aom fontconfig jpeg-xl libzip pcre2 apr freetds krb5 little-cms2 php \
-apr-util freetype libavif lz4 php@8.1 argon2 gd libidn2 m4 readline aspell gettext libnghttp2 \
-micro rtmpdump atuin gh libpng ncurses sqlite autoconf giflib libpq node starship brotli \
-git-delta libsodium node@16 tidy-html5 c-ares gmp libssh2 nvm unixodbc ca-certificates gpatch \
-libtiff oniguruma webp composer highway libtool openexr xz coreutils icu4c libunistring \
-openldap zsh curl imath libuv openssl@1.1 zstd diff-so-fancy jpeg-turbo libvmaf pcre \
---cask github iterm2 background-music fig visual-studio-code discord keepingyouawake docker \
-microsoft-teams nushell python
+brew install node starship git-delta node@16 tidy-html5 nvm ca-certificates composer coreutils curl diff-so-fancy github iterm2 fig visual-studio-code discord keepingyouawake docker microsoft-teams nushell python
 check_status "Tools and casks installation"
 
 # Install Wakatime using pip

@@ -33,13 +33,11 @@ check_status "Homebrew update"
 
 # Install tools and casks
 echo "Installing tools and casks..."
-brew install node starship git-delta node@16 tidy-html5 nvm ca-certificates composer coreutils curl diff-so-fancy github iterm2 fig visual-studio-code discord keepingyouawake docker microsoft-teams nushell python
+brew install starship git-delta tidy-html5 nvim nvm ca-certificates composer coreutils curl diff-so-fancy github iterm2 fig discord keepingyouawake nushell python 
+brew install wakatime-cli
+brew install --cask Docker visual-studio-code alt-tab termius
 check_status "Tools and casks installation"
 
-# Install Wakatime using pip
-echo "Installing Wakatime..."
-sudo pip3 install wakatime
-check_status "Wakatime installation"
 
 # Configure Wakatime API key
 echo "Configuring Wakatime API key..."
@@ -59,15 +57,9 @@ mkdir -p ~/.wakatime
 chmod 700 ~/.wakatime
 source /Users/thomas/.docker/init-zsh.sh || true  # Docker Desktop
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-export PATH="/usr/local/opt/php@8.1/bin:$PATH"
-export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
-export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-export STARSHIP_DISTRO="TLJ 🍎 - "
-source /usr/local/opt/antidote/share/antidote/antidote.zsh
-antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-eval "$(atuin init zsh)"
-eval "$(starship init zsh)"
+export STARSHIP_DISTRO="TLJ-🍎- "
 
+echo -e "\n# Aliases\nalias ls=\"ls -aG\"\nalias buildwork=\"composer install && ./scripts/wny/install-docksal-drupal.sh && fin blt sync:refresh\"\nalias root=\"cd /\"\nalias home=\"cd \$HOME\"\nalias docs=\"cd \$HOME/Documents\"\nalias work=\"cd \$HOME/Projects\"\nalias refresh=\"omz reload\"\nalias up=\"cd ..\"\nalias Root=\"cd /\"\nalias docker-clean=\"docker rm -f \$(docker ps -a -q)\"\nalias work-update=\"fin update\"\nalias editzsh=\"micro ~/.zshrc\"\nalias Home=\"cd \$HOME\"\nalias Docs=\"cd \$HOME/Documents\"\nalias WORK=\"cd \$HOME/Projects\"\nalias Work=\"cd \$HOME/Projects\"\nalias Refresh=\"omz reload\"\nalias Up=\"cd ..\"\n\n# Initialize Atuin and Starship\neval \"\$(atuin init zsh)\"\neval \"\$(starship init zsh)\"" >> ~/.zshrc
 
 # Everything is done
 echo "Script completed successfully!"

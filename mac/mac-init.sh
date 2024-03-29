@@ -40,6 +40,18 @@ bash neovim nushell ca-certificates nvm zoxide composer coreutils git-delta git
 echo "Installing casks..."
 brew install --cask alt-tab docker github jetbrains-toolbox microsoft-edge termius discord keepingyouawake mysqlworkbench visual-studio-code
 check_status "Tools and casks installation"
+# You should create NVM's working directory if it doesn't exist:
+#     mkdir ~/.nvm
+
+# Add the following to your shell profile e.g. ~/.profile or ~/.zshrc:
+#     export NVM_DIR="$HOME/.nvm"
+#     [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" # This loads nvm
+#     [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+
+nvm install 14
+nvm use 14
+# nvm install 16
+# nvm use 16
 
 cp -r .gitconfig ~/.gitconfig
 cp -r .zshrc ~/.zshrc
@@ -68,3 +80,5 @@ echo -e "\n# Aliases\nalias ls=\"ls -aG\"\nalias buildwork=\"composer install &&
 
 # Everything is done
 echo "Script completed successfully!"
+echo "Please restart your terminal to apply the changes."
+echo -e "\n# NVM\nexport NVM_DIR=\"$HOME/.nvm\"\n[ -s \"$HOMEBREW_PREFIX/opt/nvm/nvm.sh\" ] && \\. \"$HOMEBREW_PREFIX/opt/nvm/nvm.sh\" # This loads nvm\n[ -s \"$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm\" ] && \\. \"$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm\" # This loads nvm bash_completion" >> ~/.zshrc

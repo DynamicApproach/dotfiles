@@ -33,10 +33,10 @@ check_status "Homebrew update"
 
 # Install tools and casks
 echo "Installing tools and casks..."
-brew install curl ripgrep ddev/ddev/ddev go diff-so-fancy openssl@3 sqlite direnv make  starship micro php tidy-html5 \ 
+brew install curl ripgrep ddev/ddev/ddev go diff-so-fancy openssl@3 sqlite direnv make starship micro php tidy-html5 \ 
 docker-completion mkcert php@8.1  \ 
 atuin autoconf aztfexport mysql@5.7 wakatime-cli azure-cli fzf mysql@8.0 pyenv \ 
-bash neovim nushell ca-certificates zoxide composer coreutils git-delta git
+bash neovim nushell ca-certificates nvm zoxide composer coreutils git-delta git
 echo "Installing casks..."
 brew install --cask alt-tab docker github jetbrains-toolbox microsoft-edge termius discord keepingyouawake mysqlworkbench visual-studio-code
 check_status "Tools and casks installation"

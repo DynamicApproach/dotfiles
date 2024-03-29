@@ -1,27 +1,27 @@
-# Fig pre block. Keep at the top of this file.
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  [[ -f "$HOME/.fig/shell/zshrc.pre.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.pre.zsh"
-fi
-
 ####################### ALIAS ####################
 alias ls="ls -aG"
-alias buildwork="composer install && ./scripts/wny/install-docksal-drupal.sh && fin blt sync:refresh"
+alias buildfront="cd /Users/Thomas_Lloyd-Jones/Projects/Kodak_Com-Front_End_Nuxt && npm ci && npm run dev"
+alias buildcraft="cd /Users/Thomas_Lloyd-Jones/Projects/Kodak_Com-Craft_CMS && ddev start "
 alias root="cd /"
 alias home="cd $HOME"
 alias docs="cd $HOME/Documents"
-alias work="cd $HOME/Projects"
+alias Docs="cd $HOME/Documents"
 alias refresh="omz reload"
 alias up="cd .."
+alias Up="cd .."
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
 alias Root="cd /"
 alias docker-clean="docker rm -f $(docker ps -a -q)"
 alias work-update="fin update"
 alias editzsh="micro ~/.zshrc"
 alias Home="cd $HOME"
-alias Docs="cd $HOME/Documents"
 alias WORK="cd $HOME/Projects"
 alias Work="cd $HOME/Projects"
+alias work="cd $HOME/Projects"
 alias Refresh="omz reload"
-alias Up="cd .."
+
 ###################### END ALIAS ###################
 # Set up the prompt
 autoload -Uz promptinit
@@ -54,106 +54,99 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 # custom configuration for zsh-users/zsh-history-substring-search
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
 # Function for creating a new branch
 create_branch() {
-  echo "Are you working on d8 or d10? (d8/d10): \c"
-  read version
+   printf "Are you working on dev or poc? "
+   read version
+   if [ "$version" = "dev" ]; then
+       git checkout dev
+   else
+       git checkout poc
+   fi
 
-  if [ "$version" = "d10" ]; then
-    git checkout main-WIP-D10
-  else
-    git checkout WIP
-  fi
+   printf "Enter the issue number: "
+   read numm
+   printf "Enter the issue title: "
+   read name
+   # Replace spaces in branch name with underscores and convert to lowercase
+   branch_name="tlj/$numm-${name// /_}"
+   branch_name=${branch_name,,}
 
-  echo "Enter the NDD name: \c"
-  read name
+   # Check if the current directory is a git repository
+   if ! git rev-parse --git-dir > /dev/null 2>&1; then
+       echo "Error: not a git repository."
+       return 1
+   fi
 
-  branch_name="NDD-$name"
-
-  if git diff-index --quiet HEAD --; then
-    # no changes in the working directory
-    git checkout -b $branch_name
-  else
-    # changes in the working directory
-    while true; do
-      echo "You have uncommitted changes. Do you want to (s)tash them, (c)ommit them to the new branch, or (d)iscard them? (s/c/d): \c"
-      read choice
-
-      case $choice in
-      s | S)
-        git stash
-        git checkout -b $branch_name
-        break
-        ;;
-      c | C)
-        git commit -a -m "save work in progress"
-        git checkout -b $branch_name
-        break
-        ;;
-      d | D)
-        git checkout -- .
-        git checkout -b $branch_name
-        break
-        ;;
-      *)
-        echo "Invalid option."
-        ;;
-      esac
-    done
-  fi
+   # Check if there are changes in the working directory
+   if git diff-index --quiet HEAD --; then
+       git checkout -b "$branch_name"
+   else
+       while true; do
+           printf "You have uncommitted changes. Do you want to (s)tash them, (c)ommit them to the new branch, or (d)iscard them? (s/c/d): "
+           read choice
+           case $choice in
+           [sS])
+               git stash
+               git checkout -b "$branch_name"
+               break
+               ;;
+           [cC])
+               git commit -a -m "Save work in progress"
+               git checkout -b "$branch_name"
+               break
+               ;;
+           [dD])
+               git checkout -- .
+               git checkout -b "$branch_name"
+               break
+               ;;
+           *)
+               echo "Invalid option."
+               ;;
+           esac
+       done
+   fi
 }
+
+
+# Paths
+export PATH="/usr/local/opt/php@8.1/bin:$PATH"
+export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
+export PATH="/opt/homebrew/opt/mysql@8.0/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql@5.7/bin:$PATH"
+export PATH="/opt/homebrew/opt/mysql@5.7/bin:$PATH"
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
+export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
+export STARSHIP_DISTRO="TLJ 🍎 - "
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh" 
+[ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  
+export PATH="/opt/homebrew/bin:$PATH"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(atuin init zsh)"
+eval "$(starship init zsh)"
+eval "$(fzf --zsh)"
+eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
 
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-  source /Users/thomas/.docker/init-zsh.sh || true  # Added by Docker Desktop
-  test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-  export PATH="/usr/local/opt/php@8.1/bin:$PATH"
-  export PATH="/usr/local/opt/php@8.1/sbin:$PATH"
-  export PATH="/usr/local/bin:$HOME/.composer/vendor/bin:/usr/local/etc/php@8.2/bin:$PATH"
-  export STARSHIP_DISTRO="TLJ 🍎 - "
-  source /usr/local/opt/antidote/share/antidote/antidote.zsh
-  antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-  eval "$(atuin init zsh)"
-  eval "$(starship init zsh)"
-else
-  eval "$(dircolors -b)"
-  export STARSHIP_DISTRO="TLJ 🎆 - "
-  zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-  source /home/thomas/.antidote/antidote.zsh
-  antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
-  chprompt_func() {
-    # Specify the path to the directory with the different configs
-    config_dir=~/.configs/
 
-    # Store the config files as elements of an array
-    ConfigFiles=("${(@f)$(ls $config_dir)}")
 
-    echo "Choose which prompt you want"
+# On-Site Proxy
+export http_proxy=
+#export http_proxy=
+export https_proxy=$http_proxy
+export rsync_proxy=$http_proxy
+export HTTP_PROXY=$http_proxy
+export HTTPS_PROXY=$http_proxy
+export RSYNC_PROXY=$http_proxy
 
-    for i in {1..${#ConfigFiles}}; do
-        echo "[$i] ${ConfigFiles[i]}"
-    done
-
-    read choice
-
-    # Replace the contents of the starship.toml file with the contents of the chosen prompt
-    cat "${config_dir}/${ConfigFiles[choice]}" > ~/.config/starship.toml
-}
-
-  alias chprompt='chprompt_func'
-  eval "$(atuin init zsh)"
-  export STARSHIP_CONFIG=/mnt/c/Users/lloyd/.config/starship.toml
-  eval "$(starship init zsh)"
-fi
-
-# Fig post block. Keep at the bottom of this file.
-if [[ "$OSTYPE" == "darwin"* ]]; then
-[[ -f "$HOME/.fig/shell/zshrc.post.zsh" ]] && builtin source "$HOME/.fig/shell/zshrc.post.zsh"
-fi

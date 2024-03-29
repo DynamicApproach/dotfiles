@@ -242,7 +242,7 @@ format = "via [ terraform $version]($style) 壟 [$workspace]($style) "
 
 [time]
 disabled = false
-format = '🕰️[\[ $time \]]($style) '
+format = '🕰️ [\[ $time \]]($style) '
 time_format = '%T'
 utc_time_offset = '-5'
 use_12hr = true

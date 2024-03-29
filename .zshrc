@@ -23,9 +23,6 @@ alias work="cd $HOME/Projects"
 alias Refresh="omz reload"
 
 ###################### END ALIAS ###################
-# Set up the prompt
-autoload -Uz promptinit
-promptinit
 
 setopt histignorealldups sharehistory
 
